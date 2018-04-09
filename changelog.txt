@@ -1,0 +1,12 @@
+!!!----------2.0.5------------!!!
+
+- Improved SEO and fixed a few issues with artist and album pages.
+- Added an option to disable curl certificate verification to solve some issues with third party APIs.
+- Mobile devices will now use default browser scrollbar for improved scrolling performance.
+- Fixed an issue with small video player starting in fullscreen sometimes on iOS.
+- Fixed an issue where artist images from spotify would be blurry sometimes.
+- Fixed an issue where albums with slash in their name would not work properly sometimes.
+- Fixed a problem where extra folders created in BeMusic directory causing issues with settings page sometimes.
+- Fixed an issue where custom playlist image was not shown correctly when sharing it.
+- Fixed an issue with artist biography always being fetched in english even if other language was specified.
+- Fixed an issue with admin not being able to create users if email confirmation is enabled in settings page.
