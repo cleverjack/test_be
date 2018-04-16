@@ -12,6 +12,8 @@ use Exception;
 use App\Artist;
 use App\User;
 use Image;
+use App\ArtistPaymentDetail;
+use App\PlanMaster;
 
 class ProfileController extends Controller
 {
@@ -24,10 +26,17 @@ class ProfileController extends Controller
 
     public function getArtistDetail($id){
 
-        
         $artist = Artist::findOrFail($id);
-        
-        return Api::success(2040,  $artist, ['Artist']);
+        $payementDetails = collect([]);
+        $planDetails = collect([]);
+        if (isset($artist->id)) {
+            $payementDetails = ArtistPaymentDetail::where('artist_id', $artist->id)->select('stipe_publishable_key')->first();
+            $planDetails = PlanMaster::where('plan_owner', $artist->id)->where('is_active', 1)->select('plan_id','plan_name', 'description', 'amount', 'created_at')->first();
+        }
+        $data['artist'] = $artist;
+        $data['payementDetails'] = $payementDetails;
+        $data['planDetails'] = $planDetails;
+        return Api::success(2040,  $data, ['Artist']);
     }
 
     public function getListenerSelfData(){

@@ -150,7 +150,8 @@ return [
 
 		'App\Providers\SettingsServiceProvider',
 		'Tymon\JWTAuth\Providers\JWTAuthServiceProvider',
-		'Intervention\Image\ImageServiceProvider'
+		'Intervention\Image\ImageServiceProvider',
+		
 	],
 
 	/*
@@ -204,7 +205,8 @@ return [
 		'Sendgrid' => 'Sendgrid\Sendgrid',
 
 		'JWTAuth' => 'Tymon\JWTAuth\Facades\JWTAuth',
-		'Image' => 'Intervention\Image\Facades\Image'
+		'Image' => 'Intervention\Image\Facades\Image',
+		'Stripe' => 'Stripe\stripe-php'
 	],
 
 ];
