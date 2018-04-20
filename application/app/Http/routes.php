@@ -10,7 +10,6 @@ Route::post('send-links', 'SendLinksController@send');
 
 Route::post('loginUser', 'UsersAuthController@loginUser');
 
-
 Route::group(['middleware' => 'jwt.auth', 'jwt.refresh'], function () {
 
     //Musician
@@ -33,6 +32,10 @@ Route::group(['middleware' => 'jwt.auth', 'jwt.refresh'], function () {
     Route::post('subscribe-web', 'MusicianController@subscribeWeb');
 });
 
+
 Route::get('paypal-subscription-complete/{id}', 'UsersController@paypalPlanSubscriptionComplete');
 Route::post('stripe-webhook-handler', 'WebhookController@stripeWebhookHandler');
 Route::post('paypal-webhook-handler', 'WebhookController@paypalWebhookHandler');
+
+
+Route::get('stripe-connect-test', 'WebhookController@stripeConnectTest');

@@ -76,7 +76,6 @@ class MusicianController extends Controller{
 
     public function updateProfile($id){
         //TO DO
-
         $inputs = Input::all();
 
         $artist = Artist::with('user')->find($id);
@@ -229,7 +228,7 @@ class MusicianController extends Controller{
         if ($payPalEmail != '') {
             User::where('id', $userId)->update(['paypal_email'=> $payPalEmail]);
         }
-        $response['message'] = 'User payment details updated successfully!';
+        $response['message'] = 'Payment details updated successfully!';
         $response['code'] = 200;
         $response['status'] = true;
         return json_encode($response);
@@ -376,7 +375,7 @@ class MusicianController extends Controller{
             $patchRequest = new PatchRequest();
             $patchRequest->addPatch($patch);
             $plan->update($patchRequest, $apiContext);
-            $paypalId = $plan->getId();
+            $paypalId = $plan->getId(); 
         } catch (Exception $ex) { 
             $response['message'] = $e->getMessage();
             $response['code'] = 500;
@@ -566,7 +565,7 @@ class MusicianController extends Controller{
                 
                 $agreement = new Agreement();
                 $agreement->setName($input['plan_name'])
-                    ->setDescription($input['description'])
+                    ->setDescription(strip_tags($input['description']))
                     ->setStartDate($subStartDate);
                 $newPlan = new Plan();
                 $newPlan->setId($plan->getId());
@@ -574,7 +573,7 @@ class MusicianController extends Controller{
                 $payer = new Payer();
                 $payer->setPaymentMethod('paypal');
                 $agreement->setPayer($payer);
-
+                
                 $agreement->create($apiContext);
                 $link = $agreement->getApprovalLink();
 

@@ -35,7 +35,6 @@ class HomeController extends Controller
     public function index()
     {
         $pushStateRootUrl = '/';
-
         return view('main')
             ->with('user', Auth::user())
             ->with('isDemo', IS_DEMO)

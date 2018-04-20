@@ -27,6 +27,7 @@ use PayPal\Api\Plan;
 use \PayPal\Api\Agreement;
 use \PayPal\Api\Payer;
 use Redirect;
+
 class UsersController extends Controller
 {
 
@@ -57,10 +58,6 @@ class UsersController extends Controller
     ********************/
     public function subscribeArtist(Request $request)
     {
-        $obj =  new UserSubscription;
-        $data = $obj->getUserAndAgreementDetails(1);
-        print_r($data);
-        die;
         $user = JWTAuth::parseToken()->authenticate();
         $rules = [
             'type' => 'required|in:paypal,stripe',
@@ -128,7 +125,7 @@ class UsersController extends Controller
                   "items" => array(
                     array(
                       "plan" => $stripeId
-                    ),
+                    )
                   )
                 ));
             } catch (Exception $e) {
@@ -162,9 +159,7 @@ class UsersController extends Controller
                 $date = $datetime->format(DateTime::ISO8601);
                 $date = explode('+', $date);
                 $subStartDate = $date[0].'Z';
-                
                 $plan = Plan::get($paypalPlanID, $apiContext);
-                
                 $agreement = new Agreement();
                 $agreement->setName($planDetails->plan_name)
                     ->setDescription($planDetails->description)
@@ -197,19 +192,35 @@ class UsersController extends Controller
             return json_encode($response);      
         }
     }
+    /********************
+    * Creted By: Anand Jain
+    * Created At: 17 Apr 2018 12:00 PM IST
+    * Purpose: Execute subscription
+    ********************/
     public function paypalPlanSubscriptionComplete($planId)
     {
         $data = Input::all();
-        if (isset($data['success']) && $data['success'] && isset($data['token']) && $data['token'] != '') {
-            $pmObj = new PlanMaster();
-            $planDetails = $pmObj->getArtistsPlan($planId);
+        if (isset($data['success']) && $data['success'] == 'true' && isset($data['token']) && $data['token'] != '') {
+            $planDetails = PlanMaster::where('plan_id', $planId)->first();
             if (!isset($planDetails->plan_name)) {
                 echo "Error"; die;
             }
+            if ($planDetails->plan_owner == null || $planDetails->plan_owner == '') {
+                $clientID = env('PAYPAL_CLIENT_ID');
+                $clientSecret = env('PAYPAL_CLIENT_SECRET');
+                $paypalPlanID = $planDetails->paypal_id;
+            }else{
+                $pmObj = new PlanMaster();
+                $planDetails = $pmObj->getArtistsPlan($planId);
+                if (!isset($planDetails->plan_name)) {
+                    echo "Error"; die;
+                }
+                $clientID = $planDetails->paypal_client_id;
+                $clientSecret = $planDetails->paypal_client_secret;
+                $paypalPlanID = $planDetails->paypal_id;
+            }
+            
             $token = $data['token'];
-            $clientID = $planDetails->paypal_client_id;
-            $clientSecret = $planDetails->paypal_client_secret;
-            $paypalPlanID = $planDetails->paypal_id;
             $ccd = env('CURRENCY_CODE');
             $mode = env('PAY_ENV');
             $apiContext = new ApiContext(
@@ -238,6 +249,7 @@ class UsersController extends Controller
                     'paymentStatus'=>strtolower($state),
                     'payerEmail'=>$email,
                     'grand_amount'=>$planDetails->amount,
+                    'planId'=>$planId,
                     'status'=>$status
                 );
                 $paymentTableData = array(
@@ -258,13 +270,13 @@ class UsersController extends Controller
                     UserSubscription::where('user_id', $userId)->update(['is_active'=>0]);
                     UserSubscription::insert($dataForSubscription);
                 }
-               //header('location: '.env('FRONTEND_URL').'/?agreement_id='.$agreementId.'&status=200&message=Payment successfully');
                 return Redirect::to(env('FRONTEND_URL').'/?agreement_id='.$agreementId.'&status=200&message=Payment successfully');
             } catch (Exception $e) {
-                echo $e->getMessage();
+                 return Redirect::to(env('FRONTEND_URL').'/?status=500&message='.$e->getMessage());
             }
         }else{
-            echo('fasdfa');
+            //return "Payment Failed !";
+            return Redirect::to(env('FRONTEND_URL').'/?status=400&message=Error while processing payment');
         }
     }
 }

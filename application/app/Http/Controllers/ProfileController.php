@@ -14,6 +14,7 @@ use App\User;
 use Image;
 use App\ArtistPaymentDetail;
 use App\PlanMaster;
+use App\UserSubscription;
 
 class ProfileController extends Controller
 {
@@ -25,13 +26,22 @@ class ProfileController extends Controller
     }
 
     public function getArtistDetail($id){
-
         $artist = Artist::findOrFail($id);
         $payementDetails = collect([]);
         $planDetails = collect([]);
         if (isset($artist->id)) {
             $payementDetails = ArtistPaymentDetail::where('artist_id', $artist->id)->select('stipe_publishable_key')->first();
             $planDetails = PlanMaster::where('plan_owner', $artist->id)->where('is_active', 1)->select('plan_id','plan_name', 'description', 'amount', 'created_at')->first();
+            
+            if (isset($planDetails->plan_id)) {
+                $userId = $this->user->id;        
+                $isSubscribed = UserSubscription::where('plan_id', $planDetails->plan_id)->where('user_id', $userId)->where('is_active', 1)->select('subscription_id')->first();
+                if (isset($isSubscribed->subscription_id)) {
+                    $planDetails->isSubscribed = true;
+                }else{
+                    $planDetails->isSubscribed = false;
+                }
+            }
         }
         $data['artist'] = $artist;
         $data['payementDetails'] = $payementDetails;

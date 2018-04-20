@@ -14,11 +14,26 @@ class PlanMaster extends Model {
 	public function getArtistsPlan($planId)
 	{
 		return DB::table('plan_master as pm')
-								->join('artists as a', 'a.id', '=', 'pm.plan_owner')
-								->join('artist_payment_details as apd', 'apd.artist_id', '=', 'a.id')
-								->where('pm.plan_id', $planId)
-								->where('pm.is_active', 1)
-								->select('pm.plan_name', 'pm.description', 'pm.amount', 'pm.plan_owner', 'apd.stripe_key', 'pm.stripe_id', 'pm.paypal_id', 'apd.paypal_client_id', 'apd.paypal_client_secret')
-								->first();
+							->join('artists as a', 'a.id', '=', 'pm.plan_owner')
+							->join('artist_payment_details as apd', 'apd.artist_id', '=', 'a.id')
+							->where('pm.plan_id', $planId)
+							->where('pm.is_active', 1)
+							->select('pm.plan_name', 'pm.description', 'pm.amount', 'pm.plan_owner', 'apd.stripe_key', 'pm.stripe_id', 'pm.paypal_id', 'apd.paypal_client_id', 'apd.paypal_client_secret')
+							->first();
+	}
+	/********************
+  * Creted By: Anand Jain
+  * Created At: 17 Apr 2018 04:30 PM IST
+  * Purpose: Get plan and artist details by plan stripe id
+  ********************/
+	public function getPlanByStripeId($stripeId)
+	{
+		return DB::table('plan_master as pm')
+							->join('artists as a', 'a.id', '=', 'pm.plan_owner')
+							->join('artist_payment_details as apd', 'apd.artist_id', '=', 'a.id')
+							->where('pm.stripe_id', $stripeId)
+							->where('pm.is_active', 1)
+							->select('pm.plan_name', 'pm.description', 'pm.amount', 'pm.plan_owner', 'apd.stripe_key', 'pm.stripe_id', 'pm.paypal_id', 'apd.paypal_client_id', 'apd.paypal_client_secret')
+							->first();
 	}
 }

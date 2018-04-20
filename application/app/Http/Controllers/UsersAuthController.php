@@ -102,7 +102,6 @@ class UsersAuthController extends Controller
         $user['permission'] = $user->roles[0]->name;
         return Api::success($code, $user, $message);
     }
-
     /**
      * @return string
      */
@@ -111,5 +110,4 @@ class UsersAuthController extends Controller
         JWTAuth::parseToken()->invalidate();
         return Api::success(6000, [], ['You have successfully logged out']);
     }
-
 }

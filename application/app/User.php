@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
+use DB;
 
 class User extends Model implements AuthenticatableContract, CanResetPasswordContract {
 
@@ -62,7 +63,6 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
 	 */
 	public function getIsAdminAttribute()
 	{
-
 		if($this->roles->isEmpty())
 			return 0;
 		return $this->roles[0]->name == 'admin';
@@ -135,11 +135,23 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
 		if ($name && $this->last_name) {
 			$name .= ' ' . $this->last_name;
 		}
-
 		if ($name) {
 			return $name;
 		} else {
 			return explode('@', $this->email)[0];
 		}
+	}
+	/********************
+  * Creted By: Anand Jain
+  * Created At: 17 Apr 2018 04:30 PM IST
+  * Purpose: Get user details using stripe customer id
+  ********************/
+	public static function getUserDetails($custId)
+	{
+		return DB::table('user as u')
+						->join('role_user as ru', 'u.id', '=', 'ru.user_id')
+						->where('u.stripe_cust_id', $custId)
+						->where('u.confirmed', 1)
+						->first();
 	}
 }
